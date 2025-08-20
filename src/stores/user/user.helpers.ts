@@ -1,6 +1,7 @@
 import type { FirebaseUser, FirebaseAuthError, AppUser } from './user.types';
 import { getFirebaseErrorMessage } from '../../utils/authUtils';
-import type { UserUpdateData } from './user.types';
+import type { UserUpdateData, UserUpdateFields } from './user.types';
+import { serverTimestamp } from 'firebase/firestore';
 
 export const isAppUser = (obj: unknown): obj is AppUser => {
   return (
@@ -32,9 +33,18 @@ export const getErrorMessage = (error: unknown): string => {
   return isAuthError(error) ? getFirebaseErrorMessage(error) : 'Operation failed';
 };
 
-export const prepareUserUpdateData = (data: UserUpdateData): Record<string, unknown> => {
-  const updateData: Record<string, unknown> = {};
-  if (data.displayName !== undefined) updateData.displayName = data.displayName;
-  if (data.photoURL !== undefined) updateData.photoURL = data.photoURL;
+export const prepareUserUpdateData = (data: UserUpdateData): UserUpdateFields => {
+  const updateData: UserUpdateFields = {};
+
+  if (data.displayName !== undefined) {
+    updateData.displayName = data.displayName;
+  }
+
+  if (data.photoURL !== undefined) {
+    updateData.photoURL = data.photoURL;
+  }
+
+  updateData.updatedAt = serverTimestamp();
+
   return updateData;
 };

@@ -7,7 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
 import { app } from '../../app/firebaseConfig';
 import type {
   AppUser,
@@ -79,7 +79,11 @@ export const signUpAction = async (
     }
 
     const newUser = createAppUser(userCredential.user, data.displayName);
-    await setDoc(doc(db, 'users', newUser.uid), newUser);
+    await setDoc(doc(db, 'users', newUser.uid), {
+      ...newUser,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
     logAnalyticsEvent(AnalyticsEvents.USER_SIGNUP, {
       method: 'email',
@@ -121,7 +125,10 @@ export const loginAction = async (
     }
 
     const lastLogin = new Date().toISOString();
-    await updateDoc(doc(db, 'users', uid), { lastLogin });
+    await updateDoc(doc(db, 'users', uid), {
+      lastLogin: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
 
     const updatedUser = {
       ...user,
