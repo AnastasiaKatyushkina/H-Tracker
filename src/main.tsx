@@ -9,7 +9,7 @@ import YandexMetrika from './analytics/YandexMetrika';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-      <BrowserRouter>
+      <BrowserRouter basename='/H-Tracker'>
         <App />
         <YandexMetrika />
       </BrowserRouter>
